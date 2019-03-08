@@ -1,3 +1,6 @@
-pub mod converter;
-pub mod error;
-pub mod base32;
+mod error;
+mod converter;
+mod base32;
+
+pub use error::{Error, Result};
+pub use converter::{AddressType, encode, decode};

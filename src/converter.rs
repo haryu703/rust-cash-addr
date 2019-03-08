@@ -9,6 +9,8 @@ pub enum AddressType {
     P2SH = 8,
 }
 
+const SEPARATOR: char = ':';
+
 pub fn encode(prefix: &str, address_type: AddressType, hash: &[u8]) -> Result<String> {
     let prefix_data = parse_prefix(prefix)?;
 
@@ -23,13 +25,12 @@ pub fn encode(prefix: &str, address_type: AddressType, hash: &[u8]) -> Result<St
     let payload = [payload_data, checksum].concat();
 
     let payload = base32::encode(&payload);
-    const SEPARATOR: char = ':';
 
     Ok(format!("{}{}{}", prefix, SEPARATOR, payload))
 }
 
 pub fn decode(address: &str) -> Result<(String, AddressType, Vec<u8>)> {
-    let pieces: Vec<&str> = address.split(':').collect();
+    let pieces: Vec<&str> = address.split(SEPARATOR).collect();
 
     if pieces.len() != 2 {
         return Err(Error::InvalidAddressFormat(address.to_string()));
