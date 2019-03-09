@@ -4,6 +4,12 @@ version = "0.1.0"
 authors = ["haryu703"]
 edition = "2018"
 
+license = "MIT"
+description = "cash_addr format implementation inspired by cashaddrjs."
+repository = "https://github.com/haryu703/rust-cash-addr"
+readme = "README.md"
+keywords = ["bitcoin", "cash", "BCH"]
+
 [dependencies]
 bech32 = "0.6.0"
 failure = "0.1.5"
