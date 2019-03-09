@@ -3,14 +3,35 @@ use bech32::{u5, CheckBase32};
 use super::error::{Error, Result};
 use super::base32;
 
+/// Address type
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum AddressType {
+    /// P2PKH address.
     P2PKH = 0,
+    /// P2SH address.
     P2SH = 8,
 }
 
 const SEPARATOR: char = ':';
 
+/// Encode hash to cash_addr format.
+/// # Arguments
+/// * `prefix` - address prefix.
+/// * `address_type` - address type.
+/// * `hash` - hashed publickey.
+/// # Returns
+/// * cash_addr format address.
+/// # Example
+/// ```
+/// use cash_addr::{encode, AddressType};
+/// 
+/// let data = [0xF5, 0xBF, 0x48, 0xB3, 0x97, 0xDA, 0xE7, 0x0B, 0xE8, 0x2B, 0x3C, 0xCA, 0x47, 0x93, 0xF8, 0xEB, 0x2B, 0x6C, 0xDA, 0xC9];
+/// let prefix = "bitcoincash";
+/// let addr_type = AddressType::P2PKH;
+/// 
+/// let address = encode(prefix, addr_type, &data).unwrap();
+/// assert_eq!(address, "bitcoincash:qr6m7j9njldwwzlg9v7v53unlr4jkmx6eylep8ekg2");
+/// ```
 pub fn encode(prefix: &str, address_type: AddressType, hash: &[u8]) -> Result<String> {
     let prefix_data = parse_prefix(prefix)?;
 
@@ -29,6 +50,25 @@ pub fn encode(prefix: &str, address_type: AddressType, hash: &[u8]) -> Result<St
     Ok(format!("{}{}{}", prefix, SEPARATOR, payload))
 }
 
+/// Decode cash_addr.
+/// # Arguments
+/// * `address` - cash_addr format address
+/// # Resurns
+/// * Prefix.
+/// * Address type.
+/// * hashed publickey.
+/// # Example
+/// ```
+/// use cash_addr::{decode, AddressType};
+/// 
+/// let data = [0xF5, 0xBF, 0x48, 0xB3, 0x97, 0xDA, 0xE7, 0x0B, 0xE8, 0x2B, 0x3C, 0xCA, 0x47, 0x93, 0xF8, 0xEB, 0x2B, 0x6C, 0xDA, 0xC9];
+/// let address = "bitcoincash:qr6m7j9njldwwzlg9v7v53unlr4jkmx6eylep8ekg2";
+/// let (prefix, addr_type, hash) = decode(address).unwrap();
+/// 
+/// assert_eq!(prefix, "bitcoincash");
+/// assert_eq!(addr_type, AddressType::P2PKH);
+/// assert_eq!(hash, data);
+/// ```
 pub fn decode(address: &str) -> Result<(String, AddressType, Vec<u8>)> {
     let pieces: Vec<&str> = address.split(SEPARATOR).collect();
 
